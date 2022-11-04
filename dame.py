@@ -23,6 +23,7 @@ def init_damier():
     # ======mise en forme du damier avec les pions et les indices sur les bordures=======
     dim = [["-"]*n for i in range(n)]
     tableau = np.array(dim)  # tableau de dimension 12 avec des "-"
+    print(tableau)
     tableau[0][0] = "#"
     tableau[0][11] = "#"
     tableau[11][0] = "#"
@@ -32,9 +33,9 @@ def init_damier():
         tableau[i][n-1] = chr(96+i)
         tableau[0][i] = i-1
         tableau[n-1][i] = i-1
-    # for i in range(1, 5):
-    #     tableau[i][range(1+(i % 2), n-1, 2)] = "N"
-    #     tableau[n-1-i][range((i % 2), n-1, 2)] = "B"
+    for i in range(1, 5):
+        tableau[i][range(1+(i % 2), n-1, 2)] = "N"
+        tableau[n-1-i][range((i % 2), n-1, 2)] = "B"
     return tableau
 #####################################
 
@@ -222,13 +223,16 @@ if __name__ == "__main__":
     tour = 0
     if (menu()):
         damier = init_damier()
+        #######endroit pour les test########
+        # (commenter le dernier 'for' de init_damier pour enlever les pions)
         # damier[9][7] = "B"
         # damier[8][6] = "N"
         # damier[6][6] = "N"
         # damier[4][6] = "N"
 
-        damier[2][7] = "B"
-        damier[9][6] = "N"
+        # damier[2][7] = "B"
+        # damier[9][6] = "N"
+        ####################################
         a = True
         while (a != False):
             joueur = tour % 2
