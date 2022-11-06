@@ -23,7 +23,6 @@ def init_damier():
     # ======mise en forme du damier avec les pions et les indices sur les bordures=======
     dim = [["-"]*n for i in range(n)]
     tableau = np.array(dim)  # tableau de dimension 12 avec des "-"
-    print(tableau)
     tableau[0][0] = "#"
     tableau[0][11] = "#"
     tableau[11][0] = "#"
@@ -33,9 +32,9 @@ def init_damier():
         tableau[i][n-1] = chr(96+i)
         tableau[0][i] = i-1
         tableau[n-1][i] = i-1
-    for i in range(1, 5):
-        tableau[i][range(1+(i % 2), n-1, 2)] = "N"
-        tableau[n-1-i][range((i % 2), n-1, 2)] = "B"
+    # for i in range(1, 5):
+        # tableau[i][range(1+(i % 2), n-1, 2)] = "N"
+        # tableau[n-1-i][range(2-(i % 2), n-1, 2)] = "B"
     return tableau
 #####################################
 
@@ -51,8 +50,8 @@ def pion_valide_joueur(damier, pion, joueur):
 #####################################
 
 
-def deplacement_pion(damier, joueur):
-    # =======déplacer un pion selon le joueur=======
+def deplacement(damier, joueur):
+    # =======Demande de choisir le pion à deplacer=======
     # demande emplacement de départ (vérifie la couleur en fonction du joueur)
     depart = input("saisir les coordonnées du pion à déplacer (exemple a6):")
     depart = [int(ord(depart[0]))-96, int(depart[1:])+1]
@@ -61,6 +60,15 @@ def deplacement_pion(damier, joueur):
             "veuillez saisir un pion correspondant à votre couleur (exemple a6):")
         depart = [int(ord(depart[0]))-96, int(depart[1:])+1]
 
+    if (damier[depart[0]][depart[1]] == "N" or damier[depart[0]][depart[1]] == "B"):
+        deplacement_pion(damier, joueur, depart)
+    else:
+        deplacement_dame(damier, joueur, depart)
+#####################################
+
+
+def deplacement_pion(damier, joueur, depart):
+    # =======déplacer un pion selon le joueur=======
     # demande emplacement de destination (verifie case vide + verifie diag) (prévision de modification pour les pions "dame")
     arrive = input("saisir les coordonnées de destination (exemple a6):")
     arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
@@ -69,15 +77,15 @@ def deplacement_pion(damier, joueur):
         if (arrive[0] < 1 or arrive[0] > 10 or arrive[1] < 1 or arrive[1] > 10):
             arrive = input(
                 "coordonnées en dehors du damier, veuillez saisir de nouvelles coordonnées (exemple a6):")
-            arrive = [int(ord(arrive[0]))-96, int(arrive[1])+1]
+            arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
         elif (damier[arrive[0]][arrive[1]] != "-"):
             arrive = input(
                 "cette case n'est pas vide, veuillez saisir de nouvelles coordonnées (exemple a6):")
-            arrive = [int(ord(arrive[0]))-96, int(arrive[1])+1]
+            arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
         elif ((joueur == 0 and arrive[0] != depart[0]-1 or (arrive[1] != depart[1]+1 and arrive[1] != depart[1]-1)) or (joueur == 1 and arrive[0] != depart[0]+1 or (arrive[1] != depart[1]+1 and arrive[1] != depart[1]-1))):
             arrive = input(
                 "soit cette case n'est pas en diagonale ou vous essayez de reculer (possible uniquement avec les dames), veuillez saisir de nouvelles coordonnées (exemple a6):")
-            arrive = [int(ord(arrive[0]))-96, int(arrive[1])+1]
+            arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
         else:
             case_correcte = True
 
@@ -88,44 +96,40 @@ def deplacement_pion(damier, joueur):
 #####################################
 
 
-def prise_pion(damier, joueur):
-    # =======prise de pion=======
-    prise_possible = False
-    while (prise_possible == False):
-        # entrer des coordonnées de prise et verifier si la prise et possible
-        depart = [0, 0]
-        while (pion_valide_joueur(damier, depart, joueur) == False):
-            depart = input(
-                "saisir les coordonnées du pion de prise (exemple a6):")
-            depart = [int(ord(depart[0]))-96, int(depart[1])+1]
-            if (pion_valide_joueur(damier, depart, joueur) == False):
-                print("veuillez saisir un pion de votre couleur")
-
-        pion_elimine = [0, 0]
-        while (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
-            pion_elimine = input(
-                "saisir les coordonnées du pion à prendre (exemple a6):")
-            pion_elimine = [int(ord(pion_elimine[0]))-96,
-                            int(pion_elimine[1])+1]
-            if (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
-                print("veuillez saisir un pion de couleur adverse")
-
-        # verifier que l'arrive pour le pion de prise est correcte
-        arrive = [2*pion_elimine[0]-depart[0], 2*pion_elimine[1]-depart[1]]
-        if ((pion_elimine[0] == depart[0]+1 or pion_elimine[0] == depart[0]-1) and (pion_elimine[1] == depart[1]-1 or pion_elimine[1] == depart[1]+1) and (arrive[0] > 0 and arrive[0] < 11 and arrive[1] > 0 and arrive[1] < 11)):
-            if (damier[arrive[0]][arrive[1]] == "-"):
-                prise_possible = True
-            else:
-                print("cette prise n'est pas possible")
+def deplacement_dame(damier, joueur, depart):
+    # =======Deplacer une dame selon le joueur=======
+    arrive = input("saisir les coordonnées de destination (exemple a6):")
+    arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
+    case_correcte = False
+    while (case_correcte == False):
+        if (arrive[0] < 1 or arrive[0] > 10 or arrive[1] < 1 or arrive[1] > 10):
+            arrive = input(
+                "coordonnées en dehors du damier, veuillez saisir de nouvelles coordonnées (exemple a6):")
+            arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
+        elif (damier[arrive[0]][arrive[1]] != "-"):
+            arrive = input(
+                "cette case n'est pas vide, veuillez saisir de nouvelles coordonnées (exemple a6):")
+            arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
+        elif (abs(depart[0]-arrive[0]) != abs(depart[1]-arrive[1])):
+            arrive = input(
+                "vous ne jouez pas sur la diagonale de la dame(exemple a6):")
+            arrive = [int(ord(arrive[0]))-96, int(arrive[1:])+1]
         else:
-            print("cette prise n'est pas possible")
+            case_correcte = True
 
-    # effectuer les changements sur le damier
+    # échange des cases pour le déplacement
     damier[arrive[0]][arrive[1]] = damier[depart[0]][depart[1]]
     damier[depart[0]][depart[1]] = "-"
-    damier[pion_elimine[0]][pion_elimine[1]] = "-"
-    prise_repetitive(damier, joueur, arrive)
-#####################################
+####################################
+
+
+def devenir_dame(damier, pion):
+    # =======transforme un pion en dame=======
+    if (pion[0] == 1 and damier[pion[0]][pion[1]] == "B"):
+        damier[pion[0]][pion[1]] = 'ß'
+    elif (pion[0] == 10 and damier[pion[0]][pion[1]] == "N"):
+        damier[pion[0]][pion[1]] = 'Ñ'
+####################################
 
 
 def prise_possible(damier, joueur):
@@ -138,13 +142,140 @@ def prise_possible(damier, joueur):
                     print("Une prise possible pour le pion en position",
                           chr(i+96), j-1)
                     compteur_prise += 1
+            elif (joueur == 0 and damier[i][j] == 'ß'):
+                # haut gauche
+                for l in range(1, min(j, i)):
+                    if ((damier[i-l][j-l] == 'N' or damier[i-l][j-l] == 'Ñ') and damier[i-l-1][j-l-1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i-l+96), j-l-1)
+                        compteur_prise += 1
+                        break
+                # haut droite
+                for l in range(1, min(n-1-j, i)):
+                    if ((damier[i-l][j+l] == 'N' or damier[i-l][j+l] == 'Ñ') and damier[i-l-1][j+l+1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i-l+96), j+l-1)
+                        compteur_prise += 1
+                        break
+                # bas droite
+                for l in range(1, min(n-1-j, n-1-i)):
+                    if ((damier[i+l][j+l] == 'N' or damier[i+l][j+l] == 'Ñ') and damier[i+l+1][j+l+1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i+l+96), j+l-1)
+                        compteur_prise += 1
+                        break
+                # bas gauche
+                for l in range(1, min(j, n-1-i)):
+                    if ((damier[i+l][j-l] == 'N' or damier[i+l][j-l] == 'Ñ') and damier[i+l+1][j-l-1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i+l+96), j-l-1)
+                        compteur_prise += 1
+                        break
             elif (joueur == 1 and damier[i][j] == "N"):
                 if ((damier[i+1][j+1] == "B" and damier[i+2][j+2] == "-") or (damier[i+1][j-1] == "B" and damier[i+2][j-2] == "-") or (damier[i-1][j+1] == "B" and damier[i-2][j+2] == "-") or (damier[i-1][j-1] == "B" and damier[i-2][j-2] == "-")):
                     print("Une prise possible pour le pion en position",
                           chr(i+96), j-1)
                     compteur_prise += 1
+            elif (joueur == 1 and damier[i][j] == 'Ñ'):
+                # haut gauche
+                for l in range(1, min(j, i)):
+                    if ((damier[i-l][j-l] == 'B' or damier[i-l][j-l] == 'ß') and damier[i-l-1][j-l-1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i-l+96), j-l-1)
+                        compteur_prise += 1
+                        break
+                # haut droite
+                for l in range(1, min(n-1-j, i)):
+                    if ((damier[i-l][j+l] == 'B' or damier[i-l][j+l] == 'ß') and damier[i-l-1][j+l+1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i-l+96), j+l-1)
+                        compteur_prise += 1
+                        break
+                # bas droite
+                for l in range(1, min(n-1-j, n-1-i)):
+                    if ((damier[i+l][j+l] == 'B' or damier[i+l][j+l] == 'ß') and damier[i+l+1][j+l+1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i+l+96), j+l-1)
+                        compteur_prise += 1
+                        break
+                # bas gauche
+                for l in range(1, min(j, n-1-i)):
+                    if ((damier[i+l][j-l] == 'B' or damier[i+l][j-l] == 'ß') and damier[i+l+1][j-l-1] == '-'):
+                        print("Une prise possible pour la dame en position", chr(
+                            i+96), j-1, "sur le pion en", chr(i+l+96), j-l-1)
+                        compteur_prise += 1
+                        break
 
     return (compteur_prise != 0)
+#####################################
+
+
+def prise(damier, joueur):
+    depart = [0, 0]
+    while (pion_valide_joueur(damier, depart, joueur) == False):
+        depart = input(
+            "saisir les coordonnées du pion de prise (exemple a6):")
+        depart = [int(ord(depart[0]))-96, int(depart[1:])+1]
+        if (pion_valide_joueur(damier, depart, joueur) == False):
+            print("veuillez saisir un pion de votre couleur")
+
+    if (damier[depart[0]][depart[1]] == 'D' or damier[depart[0]][depart[1]] == 'N'):
+        prise_pion(damier, joueur, depart)
+    else:
+        prise_dame(damier, joueur, depart)
+
+
+def prise_pion(damier, joueur, depart):
+    # =======prise de pion par un pion=======
+    # saisie du pion à prendre
+    pion_elimine = [0, 0]
+    while (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
+        pion_elimine = input(
+            "saisir les coordonnées du pion à prendre (exemple a6):")
+        pion_elimine = [int(ord(pion_elimine[0]))-96,
+                        int(pion_elimine[1:])+1]
+        if (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
+            print("veuillez saisir un pion de couleur adverse")
+
+    # verifier le pion est en diag et que l'arrivée pour le pion de prise est correcte
+    arrive = [2*pion_elimine[0]-depart[0], 2*pion_elimine[1]-depart[1]]
+    if ((abs(depart[0]-pion_elimine[0]) == abs(depart[1]-pion_elimine[1]) == 1) and (arrive[0] > 0 and arrive[0] < 11 and arrive[1] > 0 and arrive[1] < 11)):
+        if (damier[arrive[0]][arrive[1]] != "-"):
+            print("cette prise n'est pas possible")
+            prise(damier, joueur)
+        else:
+            # effectuer les changements sur le damier et vérifier si une prise est encore possible
+            damier[arrive[0]][arrive[1]] = damier[depart[0]][depart[1]]
+            damier[depart[0]][depart[1]] = "-"
+            damier[pion_elimine[0]][pion_elimine[1]] = "-"
+            prise_repetitive(damier, joueur, arrive)
+#####################################
+
+
+def prise_dame(damier, joueur, depart):
+    # =======prise de pion par une dame=======
+    # saisie du pion à prendre
+    pion_elimine = [0, 0]
+    while (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
+        pion_elimine = input(
+            "saisir les coordonnées du pion à prendre (exemple a6):")
+        pion_elimine = [int(ord(pion_elimine[0]))-96,
+                        int(pion_elimine[1:])+1]
+        if (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
+            print("veuillez saisir un pion de couleur adverse")
+
+    # vérifier que l'arrivée est correcte et que le pion est en diag
+    arrive = [int(pion_elimine[0]+(pion_elimine[0]-depart[0])/abs(depart[0]-pion_elimine[0])),
+              int(pion_elimine[1]+(pion_elimine[1]-depart[1])/abs(depart[1]-pion_elimine[1]))]
+    if ((abs(depart[0]-pion_elimine[0]) == abs(depart[1]-pion_elimine[1])) and (arrive[0] > 0 and arrive[0] < 11 and arrive[1] > 0 and arrive[1] < 11) and (damier[arrive[0]][arrive[1]] == '-')):
+        # effectuer les changements sur le damier et vérifier si une prise est encore possible
+        damier[arrive[0]][arrive[1]] = damier[depart[0]][depart[1]]
+        damier[depart[0]][depart[1]] = "-"
+        damier[pion_elimine[0]][pion_elimine[1]] = "-"
+        prise_repetitive(damier, joueur, arrive)
+    else:
+        print("cette prise n'est pas possible")
+        prise(damier, joueur)
 #####################################
 
 
@@ -161,7 +292,7 @@ def prise_repetitive(damier, joueur, pion):
             pion_elimine = input(
                 "saisir les coordonnées du pion à prendre (exemple a6):")
             pion_elimine = [int(ord(pion_elimine[0]))-96,
-                            int(pion_elimine[1])+1]
+                            int(pion_elimine[1:])+1]
             if (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
                 print("veuillez saisir un pion de couleur adverse")
             elif (damier[2*pion_elimine[0]-pion[0]][2*pion_elimine[1]-pion[1]] != "-"):
@@ -177,7 +308,7 @@ def prise_repetitive(damier, joueur, pion):
             pion_elimine = input(
                 "saisir les coordonnées du pion à prendre (exemple a6):")
             pion_elimine = [int(ord(pion_elimine[0]))-96,
-                            int(pion_elimine[1])+1]
+                            int(pion_elimine[1:])+1]
             if (pion_valide_joueur(damier, pion_elimine, 1-joueur) == False):
                 print("veuillez saisir un pion de couleur adverse")
             elif (damier[2*pion_elimine[0]-pion[0]][2*pion_elimine[1]-pion[1]] != "-"):
@@ -198,15 +329,6 @@ def prise_repetitive(damier, joueur, pion):
 #####################################
 
 
-def devenir_dame(damier, pion):
-    # =======transforme un pion en dame=======
-    if (pion[0] == 1 and damier[pion[0]][pion[1]] == "B"):
-        damier[pion[0]][pion[1]] = 'ß'
-    elif (pion[0] == 10 and damier[pion[0]][pion[1]] == "N"):
-        damier[pion[0]][pion[1]] = 'Ñ'
-####################################
-
-
 def est_finie(damier):
     # =======verifier si la partie est finie======= (return True si un joueur n'a plus de pions mais aussi si il n'y a plus aucun coup possible)
     # verifier si un joueur n'a plus de pion
@@ -220,22 +342,21 @@ def est_finie(damier):
 ############### programme ######################
 if __name__ == "__main__":
     joueur = 0
-    tour = 0
+    coup = 0
     if (menu()):
         damier = init_damier()
-        #######endroit pour les test########
+        #######endroit pour les tests########
         # (commenter le dernier 'for' de init_damier pour enlever les pions)
-        # damier[9][7] = "B"
-        # damier[8][6] = "N"
-        # damier[6][6] = "N"
-        # damier[4][6] = "N"
-
-        # damier[2][7] = "B"
-        # damier[9][6] = "N"
+        damier[8][4] = 'ß'
+        damier[7][4] = 'ß'
+        damier[6][2] = 'Ñ'
+        damier[3][9] = 'Ñ'
+        damier[5][7] = 'Ñ'
+        damier[9][2] = 'Ñ'
         ####################################
         a = True
         while (a != False):
-            joueur = tour % 2
+            joueur = coup % 2
             print(damier)
             if (joueur == 0):
                 print("tour du joueur blanc")
@@ -243,8 +364,8 @@ if __name__ == "__main__":
                 print("tour joueur noir")
             if (prise_possible(damier, joueur)):
                 print("la prise est obligatoire")
-                prise_pion(damier, joueur)
+                prise(damier, joueur)
             else:
-                deplacement_pion(damier, joueur)
-            tour += 1
-    print("partie terminée")
+                deplacement(damier, joueur)
+            coup += 1
+    print(f"partie terminée en {coup:d} coup")
