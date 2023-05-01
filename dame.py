@@ -399,7 +399,7 @@ if __name__ == "__main__":
     fin = [0, 0]
     if (menu()):
         damier = init_damier()
-        #######endroit pour les tests########
+        ####### endroit pour les tests########
         # (commenter le dernier 'for' de init_damier pour enlever les pions)
         ####################################
         a = False
