@@ -9,7 +9,7 @@ Ce projet est un jeu de dames développé en Python jouable au terminal. Le jeu 
 
         python dame.py
 
-3.  Le jeu se lance et vous pouvez commencer à jouer (ou non). vous indiquerez la position de votre pion à déplacer et la position de la case où vous voulez le déplacer. Si vous pouvez capturer un pion adverse, vous devez le faire. Si il y a plusieurs prise possible, vous devez choisir celle qui vous convient.
+3.  Le jeu se lance et vous pouvez commencer à jouer. vous indiquerez la position de votre pion à déplacer et la position de la case où vous voulez le déplacer. Si vous pouvez capturer un pion adverse, vous devez le faire. Si il y a plusieurs prise possible, vous devez choisir celle qui vous convient.
 
 ## Fonctionnalités
 
