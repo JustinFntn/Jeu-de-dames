@@ -19,5 +19,5 @@ class Pion:
 
 
 if __name__ == "__main__":
-    pion = Pion()
-    pion.default()
+    var: str = '123456789'
+    print(f'{var:_<20}')

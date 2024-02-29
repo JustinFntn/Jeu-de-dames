@@ -17,11 +17,27 @@ class Damier:
         return self.damier[x][y]
 
     def __str__(self) -> str:
-        display: str = ""
-        for ligne in self.damier:
+        display: str = "    "
+        for i in range(self.DIMENSION):
+            display += str(i)+"  "
+
+        display += "\n  ╔"
+        for i in range(self.DIMENSION):
+            display += "═══"
+        display += "╗\n"
+
+        for index, ligne in enumerate(self.damier):
+            display += chr(97+index)+" ║ "
             for case in ligne:
-                display += str(case)+" "
-            display += "\n"
+                display += str(case)+"  "
+            display = display[:-1]
+            display += "║ "+chr(97+index)
+            display += "\n\n"
+
+        display = display[:-1]
+        display += "   "
+        for i in range(len(self.damier[0])):
+            display += "═══"
         return display
 
     def __repr__(self) -> str:
